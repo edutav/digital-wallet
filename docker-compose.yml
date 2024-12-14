@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16.3-alpine3.19
+    container_name: postgres_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: digital_wallet_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - wallet
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/digital_wallet_db
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - wallet
+
+networks:
+  wallet:
+    driver: bridge
+
+volumes:
+  db_data:
